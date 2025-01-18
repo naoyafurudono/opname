@@ -27,15 +27,35 @@ type generator struct {
 var _ Generator = &generator{}
 
 // Create new Generator whose Prefix() is prefix.
-func New(prefix string) (Generator, error) {
+func New(prefix string, opts ...Option) (Generator, error) {
 	if !validPrefix(prefix) {
 		return nil, fmt.Errorf("prefix length must satisfy 1 <= length <= %d", MaxPrefixSize)
 	}
 	if !validDict(dict) {
 		return nil, errors.New("dict is not valid")
 	}
+	g := generator{prefix, dict}
+	for _, opt := range opts {
+		if err := opt(&g) ; err != nil {
+			return fmt.Errorf("failed to apply option: %w", err)
+		}
+	}
 
-	return &generator{prefix, dict}, nil
+	return &g, nil
+}
+
+// Option for Generator constructor.
+type Option func(* generator)error
+
+// Specify nick name dictionary of created Generator.
+func NicknameDict(d []string)Option{
+	return func(g *generator) error {
+		if !validDict(d) {
+			return errors.New("invalid dict")
+		}
+		g.dict = d
+		return nil
+	}
 }
 
 func (g *generator) Gen() string {
