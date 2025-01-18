@@ -37,10 +37,9 @@ func New(prefix string, opts ...Option) (Generator, error) {
 	g := generator{prefix, dict}
 	for _, opt := range opts {
 		if err := opt(&g) ; err != nil {
-			return fmt.Errorf("failed to apply option: %w", err)
+			return nil, fmt.Errorf("failed to apply option: %w", err)
 		}
 	}
-
 	return &g, nil
 }
 
@@ -86,11 +85,11 @@ const datetimeSize = 4 + 4
 // Max prefix size of generator
 const MaxPrefixSize = 4
 // Max size of nick name
-const SafePrettySup = MaxSize - datetimeSize - MaxPrefixSize
+const MacNicknameSize = MaxSize - datetimeSize - MaxPrefixSize
 
 var (
 	prefixRegexp = regexp.MustCompile(fmt.Sprintf(`^[a-z][a-z0-9]{0,%d}$`, MaxPrefixSize-1))
-	nicknameRegexp = regexp.MustCompile(fmt.Sprintf(`^[a-z0-9]{0,%d}[a-z]$`, SafePrettySup-1))
+	nicknameRegexp = regexp.MustCompile(fmt.Sprintf(`^[a-z0-9]{0,%d}[a-z]$`, MacNicknameSize-1))
 )
 
 func validPrefix(s string) bool {
