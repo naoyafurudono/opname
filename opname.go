@@ -7,11 +7,14 @@ import (
 	"time"
 )
 
+// Ops friendry name generator.
+//
+// Safe to call in multi-threaded manner.
 type Generator interface {
-	// 最大maxSize文字の文字列を生成する。実行時刻によって異なる値を返す.
-	// 先頭にはPrefix()を含む.
+	// The length of generated names is less than or equal to 28.
+	// The prefix of Gen() is always Prefix().
 	Gen() string
-	// このジェネレータが返す文字列のprefix.
+	// Returns the prefix of the Generator instance.
 	Prefix() string
 }
 
@@ -21,6 +24,7 @@ type generator struct {
 
 var _ Generator = &generator{}
 
+// Create new Generator whose Prefix() is prefix.
 func New(prefix string) (Generator, error) {
 	if !validPrefix(prefix) {
 		return nil, errors.New("prefix length must satisfy 1 <= length <= 4")
