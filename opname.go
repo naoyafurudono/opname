@@ -1,7 +1,6 @@
 package opname
 
 import (
-	"errors"
 	"fmt"
 	"math/rand"
 	"regexp"
@@ -31,12 +30,12 @@ func New(prefix string, opts ...Option) (Generator, error) {
 	if !validPrefix(prefix) {
 		return nil, fmt.Errorf("prefix length must satisfy 1 <= length <= %d", MaxPrefixSize)
 	}
-	if !validDict(dict) {
-		return nil, errors.New("dict is not valid")
+	if err := validDict(dict); err != nil {
+		return nil, err
 	}
 	g := generator{prefix, dict}
 	for _, opt := range opts {
-		if err := opt(&g) ; err != nil {
+		if err := opt(&g); err != nil {
 			return nil, fmt.Errorf("failed to apply option: %w", err)
 		}
 	}
@@ -44,13 +43,13 @@ func New(prefix string, opts ...Option) (Generator, error) {
 }
 
 // Option for Generator constructor.
-type Option func(* generator)error
+type Option func(*generator) error
 
 // Specify nick name dictionary of created Generator.
-func NicknameDict(d []string)Option{
+func NicknameDict(d []string) Option {
 	return func(g *generator) error {
-		if !validDict(d) {
-			return errors.New("invalid dict")
+		if err := validDict(d); err != nil {
+			return err
 		}
 		g.dict = d
 		return nil
@@ -82,39 +81,39 @@ func (g *generator) Prefix() string {
 // Max size of generated name
 const MaxSize = 28
 const datetimeSize = 4 + 4
+
 // Max prefix size of generator
 const MaxPrefixSize = 4
+
 // Max size of nick name
-const MacNicknameSize = MaxSize - datetimeSize - MaxPrefixSize
+const MaxNicknameSize = MaxSize - datetimeSize - MaxPrefixSize
 
 var (
-	prefixRegexp = regexp.MustCompile(fmt.Sprintf(`^[a-z][a-z0-9]{0,%d}$`, MaxPrefixSize-1))
-	nicknameRegexp = regexp.MustCompile(fmt.Sprintf(`^[a-z0-9]{0,%d}[a-z]$`, MacNicknameSize-1))
+	prefixRegexp   = regexp.MustCompile(fmt.Sprintf(`^[a-z][a-z0-9]{0,%d}$`, MaxPrefixSize-1))
+	nicknameRegexp = regexp.MustCompile(fmt.Sprintf(`^[a-z0-9]{0,%d}[a-z]$`, MaxNicknameSize-1))
 )
 
 func validPrefix(s string) bool {
 	return prefixRegexp.Match([]byte(s))
 }
 
-func validPretty(s string) bool {
+func validNichname(s string) bool {
 	return nicknameRegexp.Match([]byte(s))
 }
 
-func validDict(ss []string) bool {
+func validDict(ss []string) error {
 	for _, s := range ss {
-		if !validPrefix(s) {
-			return false
+		if !validNichname(s) {
+			return fmt.Errorf("invalid nichname: %s", s)
 		}
 	}
-	return true
+	return nil
 }
 
-var dict = []string{"dry", "dew", "bay", "hot", "icy", "fen", "wet", "dew", "icy", "dry", "fog", "bog", "wet", "wind", "calm", "pier", "dock", "port", "peal", "dune", "boom", "snow", "mild", "cool", "hail", "warm", "cold", "lake", "halo", "gust", "gale", "pond", "hazy", "mire", "rain", "heat", "flow", "airy", "mist", "haze", "smog", "tide", "thaw", "rime", "warm", "dewy", "arid", "flow", "cool", "roar", "boom", "bolt", "drip", "wave", "soak", "surf", "heat", "flash", "frost", "moist", "point", "tidal", "front", "jetty", "flash", "drift", "frost", "rainy", "whirl", "cloud", "clear", "clear", "chill", "flood", "humid", "clime", "flood", "radar", "solar", "draft", "glaze", "lunar", "swamp", "gusty", "spark", "vapor", "cloud", "snowy", "brisk", "balmy", "beach", "nippy", "shore", "muggy", "fresh", "marsh", "crisp", "blowy", "dusty", "dense", "soggy", "heavy", "foggy", "light", "smoky", "thick", "sunny", "crack", "shiny", "windy", "rainy", "storm", "chill", "drift", "coast", "sleet", "squall", "mirage", "freezy", "powder", "shovel", "arctic", "stormy", "static", "bright", "rumble", "breeze", "lagoon", "freeze", "wintry", "sparse", "breezy", "sultry", "frigid", "chilly", "frozen", "bitter", "steamy", "harbor", "drippy", "biting", "stormy", "drying", "cloudy", "frosty", "fogbow", "sundog", "shower", "pillar", "corona", "season", "icicle", "icecap", "aurora", "nimbus", "shiver", "puddle", "system", "funnel", "haboob", "levant", "cirrus", "nimbus", "meteor", "runoff", "mirage", "aurora", "kelvin", "bright", "zephyr", "puddle", "squall", "boreal", "tundra", "vortex", "icecap", "albedo", "stream", "icicle", "drafty", "static", "strike", "warmth", "splash", "slushy", "eclipse", "updraft", "current", "icycold", "frosted", "riptide", "climate", "drizzle", "monsoon", "estuary", "cyclone", "beaming", "tornado", "pouring", "flooded", "soaking", "splashy", "typhoon", "stratus", "cumulus", "rivulet", "cascade", "snowman", "sunbeam", "radiant", "trickle", "spatter", "celsius", "iceberg", "thunder", "rainbow", "celsius", "degrees", "eclipse", "drought", "glacier", "cyclone", "showery", "oldsnow", "chinook", "drizzle", "graupel", "melting", "glacial", "boiling", "thunder", "searing", "wetness", "snowcap", "whisper", "rainbow", "weather", "sunbeam", "tornado", "typhoon", "cyclone", "monsoon", "mistral", "cumulus", "thermal", "stratus", "windfarm", "sunlight", "undertow", "easterly", "forecast", "pressure", "climatic", "westerly", "downpour", "seashore", "blizzard", "clearsky", "snowfall", "overcast", "mudslide", "anabatic", "snowshoe", "chubasco", "tropical", "snowplow", "snowball", "sunshine", "overcast", "snowmelt", "meteoric", "snowfall", "heatwave", "icelayer", "icesheet", "humidity", "humidity", "frosting", "freezing", "icebound", "forecast", "blackice", "icesleet", "freezing", "whiteout", "volcanic", "eruption", "ashcloud", "blizzard", "heatwave", "raincoat", "moonbeam", "tropical", "sunlight", "electric", "snowline", "raindrum", "thundery", "raindrop", "borealis", "raingear", "raindrop", "spectrum", "moisture", "snowpack", "rainwear", "rainfall", "frostbite", "northerly", "rainslick", "driftwood", "iceflower", "cloudbank", "scorching", "lightning", "rainproof", "snowdrift", "australis", "celestial", "blizzardy", "temperate", "windblown", "starlight", "supercell", "meteorite", "dustcloud", "condition", "downdraft", "raincheck", "hailstorm", "hailstone", "satellite", "barometer", "meltwater", "freshsnow", "windspeed", "rainstorm", "jetstream", "windstorm", "rainmeter", "snowflake", "warmfront", "reservoir", "evalanche", "frostwork", "sparkling", "frostbite", "radiating", "lightning", "hurricane", "raincloud", "whirlwind", "frostline", "katabatic", "clearance", "coldfront", "sandstorm", "duststorm", "snowfield", "galeforce", "snowflake", "hurricane", "southerly", "icecrystal", "cloudburst", "sweltering", "fahrenheit", "refraction", "floodplain", "cloudscape", "anemometer", "fahrenheit", "hygrometer", "atmosphere", "glaciation", "waterspout", "breakwater", "overheated", "prediction", "glistening", "frostflower", "temperature", "thermometer", "weathercock", "altocumulus", "meteorology", "temperature", "seismometer", "anticyclone", "nimbostratus", "cyclogenesis", "thunderstorm", "cirrostratus", "cirrocumulus", "precipitation"}
+var dict = []string{"dry", "dew", "bay", "hot", "icy", "fen", "wet", "dew", "icy", "dry", "fog", "bog", "wet", "wind", "calm", "pier", "dock", "port", "peal", "dune", "boom", "snow", "mild", "cool", "hail", "warm", "cold", "lake", "halo", "gust", "gale", "pond", "hazy", "mire", "rain", "heat", "flow", "airy", "mist", "haze", "smog", "tide", "thaw", "rime", "warm", "dewy", "arid", "flow", "cool", "roar", "boom", "bolt", "drip", "wave", "soak", "surf", "heat", "frost", "moist", "point", "tidal", "front", "jetty", "flash", "drift", "frost", "rainy", "whirl", "cloud", "clear", "clear", "chill", "flood", "humid", "clime", "flood", "radar", "solar", "draft", "glaze", "lunar", "swamp", "gusty", "spark", "vapor", "cloud", "snowy", "brisk", "balmy", "beach", "nippy", "shore", "muggy", "fresh", "marsh", "crisp", "blowy", "dusty", "dense", "soggy", "heavy", "foggy", "light", "smoky", "thick", "sunny", "crack", "shiny", "windy", "rainy", "storm", "chill", "drift", "coast", "sleet", "squall", "mirage", "freezy", "powder", "shovel", "arctic", "stormy", "static", "bright", "rumble", "breeze", "lagoon", "freeze", "wintry", "sparse", "breezy", "sultry", "frigid", "chilly", "frozen", "bitter", "steamy", "harbor", "drippy", "biting", "stormy", "drying", "cloudy", "frosty", "fogbow", "sundog", "shower", "pillar", "corona", "season", "icicle", "icecap", "aurora", "nimbus", "shiver", "puddle", "system", "funnel", "haboob", "levant", "cirrus", "nimbus", "meteor", "runoff", "mirage", "aurora", "kelvin", "bright", "zephyr", "puddle", "squall", "boreal", "tundra", "vortex", "icecap", "albedo", "stream", "icicle", "drafty", "static", "strike", "warmth", "splash", "slushy", "eclipse", "updraft", "current", "icycold", "frosted", "riptide", "climate", "drizzle", "monsoon", "estuary", "cyclone", "beaming", "tornado", "pouring", "flooded", "soaking", "splashy", "typhoon", "stratus", "cumulus", "rivulet", "cascade", "snowman", "sunbeam", "radiant", "trickle", "spatter", "celsius", "iceberg", "thunder", "rainbow", "celsius", "degrees", "eclipse", "drought", "glacier", "cyclone", "showery", "oldsnow", "chinook", "drizzle", "graupel", "melting", "glacial", "boiling", "thunder", "searing", "wetness", "snowcap", "whisper", "rainbow", "weather", "sunbeam", "tornado", "typhoon", "cyclone", "monsoon", "mistral", "cumulus", "thermal", "stratus", "windfarm", "sunlight", "undertow", "easterly", "forecast", "pressure", "climatic", "westerly", "downpour", "seashore", "blizzard", "clearsky", "snowfall", "overcast", "mudslide", "anabatic", "snowshoe", "chubasco", "tropical", "snowplow", "snowball", "sunshine", "overcast", "snowmelt", "meteoric", "snowfall", "heatwave", "icelayer", "icesheet", "humidity", "humidity", "frosting", "freezing", "icebound", "forecast", "blackice", "icesleet", "freezing", "whiteout", "volcanic", "eruption", "ashcloud", "blizzard", "heatwave", "raincoat", "moonbeam", "tropical", "sunlight", "electric", "snowline", "raindrum", "thundery", "raindrop", "borealis", "raingear", "raindrop", "spectrum", "moisture", "snowpack", "rainwear", "rainfall", "frostbite", "northerly", "rainslick", "driftwood", "iceflower", "cloudbank", "scorching", "lightning", "rainproof", "snowdrift", "australis", "celestial", "blizzardy", "temperate", "windblown", "starlight", "supercell", "meteorite", "dustcloud", "condition", "downdraft", "raincheck", "hailstorm", "hailstone", "satellite", "barometer", "meltwater", "freshsnow", "windspeed", "rainstorm", "jetstream", "windstorm", "rainmeter", "snowflake", "warmfront", "reservoir", "evalanche", "frostwork", "sparkling", "frostbite", "radiating", "lightning", "hurricane", "raincloud", "whirlwind", "frostline", "katabatic", "clearance", "coldfront", "sandstorm", "duststorm", "snowfield", "galeforce", "snowflake", "hurricane", "southerly", "icecrystal", "cloudburst", "sweltering", "fahrenheit", "refraction", "floodplain", "cloudscape", "anemometer", "fahrenheit", "hygrometer", "atmosphere", "glaciation", "waterspout", "breakwater", "overheated", "prediction", "glistening", "frostflower", "temperature", "thermometer", "weathercock", "altocumulus", "meteorology", "temperature", "seismometer", "anticyclone", "nimbostratus", "cyclogenesis", "thunderstorm", "cirrostratus", "cirrocumulus", "precipitation"}
 
 func init() {
-	for i, p := range dict {
-		if !validPretty(p) {
-			panic(fmt.Sprintf("too long nickname in the dict %d / %d: %s\n", i, len(dict), p))
-		}
+	if err := validDict(dict); err != nil {
+		panic(err)
 	}
 }

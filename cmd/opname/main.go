@@ -7,6 +7,7 @@ import (
 
 var CLI struct {
 	Prefix string `arg:""`
+	Num    int    `long:"num" short:"n" default:"1"`
 }
 
 func main() {
@@ -15,5 +16,7 @@ func main() {
 	if err != nil {
 		ctx.FatalIfErrorf(err)
 	}
-	println(g.Gen())
+	for range CLI.Num {
+		println(g.Gen())
+	}
 }
