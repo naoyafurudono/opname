@@ -1,37 +1,40 @@
 # opname
 
-オペレーションで取り回しやすい名前生成器。
+Operation friendly name generator.
 
-以下の性質を持つ名前を生成する。
+Generated names satisfy following:
 
-- 種別を誤解しにくい
-- 衝突しにくい
-- コピペしやすい（ハイフンなどを含まない）
-- ほどほどに短い
-- 無難な文字種から構成される
-  - URLセーフ
-- 愛称を持つ
-- 辞書式順でソートすると、おおよそ生成時刻順になる
+- Has given prefix
+- Easy to copy and past
+- Valid as DNS label, i.e.,
+  - contain at most 63 characters
+  - contain only lowercase alphanumeric characters or '-'
+  - start with an alphanumeric character
+  - end with an alphanumeric character
+- Has nick name
+- The order generated follows lexicographical order
 
-## 形式
+## Format
 
 ```
 <prefix>-<date>-<time>-<pretty name>
 ```
 
-### 例
+### Example
 
 ```
 usr20250118215723red
 ```
 
-## 使い方
+## Usage
 
-### CLIから使う
+### CLI
 
-`opname <prefix>` を実行すると標準出力に上記フォーマットの名前が出力される。
-`<pretty name>`として採用されうる名前は、バイナリに埋め込まれており現時点では指定できない。将来設定できるようにするかもしれない。
+1. Install: `go install github.com/naoyafurudono/opname:latest`
+2. Run: `opname <prefix>`.
 
-### ライブラリとして使う
+### Use as a library
 
-Go docを見てください。
+`go install github.com/naoyafurudono/opname:latest`
+
+See godoc for details.
