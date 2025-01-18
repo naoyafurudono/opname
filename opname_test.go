@@ -7,8 +7,8 @@ import (
 
 func TestFormat(t *testing.T) {
 	cases := []struct {
-		prefix string
-		ti     time.Time
+		prefix   string
+		ti       time.Time
 		nickname string
 
 		want string
@@ -56,7 +56,7 @@ func TestValidPrefix(t *testing.T) {
 	}
 }
 
-func TestValidPretty(t *testing.T) {
+func TestValidNickname(t *testing.T) {
 	cases := []struct {
 		s    string
 		want bool
@@ -72,7 +72,7 @@ func TestValidPretty(t *testing.T) {
 
 	for _, tt := range cases {
 		t.Run(tt.s, func(t *testing.T) {
-			if validPretty(tt.s) != tt.want {
+			if validNichname(tt.s) != tt.want {
 				t.Fail()
 			}
 		})
