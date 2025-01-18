@@ -37,4 +37,4 @@ usr20250118215723red
 
 `go install github.com/naoyafurudono/opname@latest`
 
-See godoc for details.
+See [documents](https://pkg.go.dev/github.com/naoyafurudono/opname).
