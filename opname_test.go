@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func Test(t *testing.T) {
+func TestFormat(t *testing.T) {
 	cases := []struct {
 		prefix string
 		ti     time.Time
@@ -28,6 +28,52 @@ func Test(t *testing.T) {
 			actual := n
 			if actual != tt.want {
 				t.Fatalf("want: %s, actual: %s", tt.want, actual)
+			}
+		})
+	}
+}
+
+func TestValidPrefix(t *testing.T) {
+	cases := []struct {
+		s    string
+		want bool
+	}{
+		{"ok", true},
+		{"safe", true},
+		{"longer", false},
+		{"", false},
+		{"1ng", false},
+		{"ok1", true},
+		{"o1k", true},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.s, func(t *testing.T) {
+			if validPrefix(tt.s) != tt.want {
+				t.Fail()
+			}
+		})
+	}
+}
+
+func TestValidPretty(t *testing.T) {
+	cases := []struct {
+		s    string
+		want bool
+	}{
+		{"ok", true},
+		{"safe", true},
+		{"longerlongerlongerlongerlonger", false},
+		{"", false},
+		{"1ng", true},
+		{"ok1", false},
+		{"o1k", true},
+	}
+
+	for _, tt := range cases {
+		t.Run(tt.s, func(t *testing.T) {
+			if validPretty(tt.s) != tt.want {
+				t.Fail()
 			}
 		})
 	}
