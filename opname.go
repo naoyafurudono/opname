@@ -42,17 +42,17 @@ func (g *generator) Gen() string {
 	t := time.Now()
 	source := rand.NewSource(t.UnixNano())
 	r := rand.New(source)
-	pretty := dict[r.Intn(len(dict))]
+	nickname := dict[r.Intn(len(dict))]
 
-	return format(g.prefix, t, pretty)
+	return format(g.prefix, t, nickname)
 }
 
-func format(prefix string, t time.Time, pretty string) string {
+func format(prefix string, t time.Time, nickname string) string {
 	return fmt.Sprintf("%s%s%s%s",
 		prefix,
 		t.Format("20060102"),
 		t.Format("150405"),
-		pretty,
+		nickname,
 	)
 }
 
@@ -70,7 +70,7 @@ const SafePrettySup = MaxSize - datetimeSize - MaxPrefixSize
 
 var (
 	prefixRegexp = regexp.MustCompile(fmt.Sprintf(`^[a-z][a-z0-9]{0,%d}$`, MaxPrefixSize-1))
-	prettyRegexp = regexp.MustCompile(fmt.Sprintf(`^[a-z0-9]{0,%d}[a-z]$`, SafePrettySup-1))
+	nicknameRegexp = regexp.MustCompile(fmt.Sprintf(`^[a-z0-9]{0,%d}[a-z]$`, SafePrettySup-1))
 )
 
 func validPrefix(s string) bool {
@@ -78,7 +78,7 @@ func validPrefix(s string) bool {
 }
 
 func validPretty(s string) bool {
-	return prettyRegexp.Match([]byte(s))
+	return nicknameRegexp.Match([]byte(s))
 }
 
 func validDict(ss []string) bool {
@@ -95,7 +95,7 @@ var dict = []string{"dry", "dew", "bay", "hot", "icy", "fen", "wet", "dew", "icy
 func init() {
 	for i, p := range dict {
 		if !validPretty(p) {
-			panic(fmt.Sprintf("too long pretty in the dict %d / %d: %s\n", i, len(dict), p))
+			panic(fmt.Sprintf("too long nickname in the dict %d / %d: %s\n", i, len(dict), p))
 		}
 	}
 }

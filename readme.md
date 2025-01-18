@@ -17,7 +17,7 @@ Generated names satisfy following:
 ## Format
 
 ```
-<prefix>-<date>-<time>-<pretty name>
+<prefix>-<date>-<time>-<nickname>
 ```
 
 ### Example

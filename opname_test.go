@@ -9,7 +9,7 @@ func TestFormat(t *testing.T) {
 	cases := []struct {
 		prefix string
 		ti     time.Time
-		pretty string
+		nickname string
 
 		want string
 	}{
@@ -24,7 +24,7 @@ func TestFormat(t *testing.T) {
 
 	for _, tt := range cases {
 		t.Run(tt.want, func(t *testing.T) {
-			n := format(tt.prefix, tt.ti, tt.pretty)
+			n := format(tt.prefix, tt.ti, tt.nickname)
 			actual := n
 			if actual != tt.want {
 				t.Fatalf("want: %s, actual: %s", tt.want, actual)
