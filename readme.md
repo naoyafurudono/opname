@@ -30,11 +30,11 @@ usr20250118215723red
 
 ### CLI
 
-1. Install: `go install github.com/naoyafurudono/opname:latest`
+1. Install: `go install github.com/naoyafurudono/opname/cmd/opname@latest`
 2. Run: `opname <prefix>`.
 
 ### Use as a library
 
-`go install github.com/naoyafurudono/opname:latest`
+`go install github.com/naoyafurudono/opname@latest`
 
 See godoc for details.
