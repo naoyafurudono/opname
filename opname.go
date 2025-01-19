@@ -78,15 +78,14 @@ func (g *generator) Prefix() string {
 	return g.prefix
 }
 
-// Max size of generated name
+// Max size of generated name.
 const MaxSize = 28
-const datetimeSize = 4 + 4
 
-// Max prefix size of generator
+// Max prefix size of generator.
 const MaxPrefixSize = 4
 
-// Max size of nick name
-const MaxNicknameSize = MaxSize - datetimeSize - MaxPrefixSize
+// Max size of nicknames.
+const MaxNicknameSize = MaxSize - 8 /* date and time */ - MaxPrefixSize
 
 var (
 	prefixRegexp   = regexp.MustCompile(fmt.Sprintf(`^[a-z][a-z0-9]{0,%d}$`, MaxPrefixSize-1))
